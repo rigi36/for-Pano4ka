@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для тебя</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #fff5f7;
+            font-family: 'Georgia', serif;
+            color: #4a4a4a;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .photo-container {
+            background: white;
+            padding: 10px 10px 30px 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: rotate(-3deg);
+            margin-bottom: 30px;
+            max-width: 280px;
+            opacity: 0;
+            animation: fadeInPhoto 2s ease-in forwards;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        h1 { font-size: 1.8rem; text-align: center; margin-bottom: 2rem; }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        #yesBtn { background-color: #ff4d6d; color: white; }
+        #noBtn { background-color: #e0e0e0; color: #757575; position: absolute; }
+
+        .success-message { display: none; text-align: center; animation: fadeIn 1s ease-in; }
+
+        @keyframes fadeInPhoto { from { opacity: 0; transform: rotate(-3deg) scale(0.9); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="quiz">
+        <div class="photo-container">
+            <img src="https://i.imgur.com/ВашеФото.jpg" alt="Memory">
+        </div>
+        <h1>Паночка, ты будешь моей валентинкой?</h1>
+        <div class="buttons">
+            <button id="yesBtn" onclick="showSuccess()">Да</button>
+            <button id="noBtn" onmouseover="moveButton()">Нет</button>
+        </div>
+    </div>
+
+    <div id="success" class="success-message">
+        <p style="font-size: 2rem;">Урраааа!!!❤️</p>
+        <p>Я тебя люблю!!</p>
+    </div>
+
+    <script>
+        function moveButton() {
+            const btn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+        function showSuccess() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
