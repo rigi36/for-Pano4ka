@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Для Паночки<3</title>
+    <title>Для тебя</title>
     <style>
         body {
             display: flex;
@@ -22,7 +22,7 @@
             position: relative;
             z-index: 10;
             text-align: center;
-            background: rgba(255, 245, 247, 0.85); /* Полупрозрачная подложка, чтобы текст читался на фоне фото */
+            background: rgba(255, 245, 247, 0.85); 
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -33,7 +33,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Кнопки теперь жестко стоят рядом */
         .buttons {
             display: flex;
             gap: 20px;
@@ -65,7 +64,6 @@
             border-radius: 20px;
         }
 
-        /* Галерея теперь на весь экран */
         #photo-gallery {
             position: absolute; 
             top: 0; left: 0; width: 100%; height: 100%;
@@ -75,7 +73,7 @@
 
         .scattered-photo {
             position: absolute;
-            width: 130px; /* Оптимальный размер для телефона */
+            width: 130px; 
             background: white;
             padding: 6px 6px 20px 6px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -118,12 +116,24 @@
 
     <div id="success" class="success-message">
         <p style="font-size: 3.5rem; margin: 10px;">❤️</p>
-        <p style="font-size: 2rem; margin: 5px;">Уррраааааа!!!!</p>
-        <p style="font-size: 1.5rem; color: #ff4d6d; margin: 5px;">Я тебя люблю!!</p>
+        <p style="font-size: 2rem; margin: 5px;">Уррраааааа!</p>
+        <p style="font-size: 1.5rem; color: #ff4d6d; margin: 5px;">Я тебя люблю!</p>
     </div>
 
     <script>
-        // 1. Математика шестиугольника
+        // СПИСОК ФРАЗ ДЛЯ КНОПКИ "НЕТ"
+        // Ты можешь менять текст в кавычках и добавлять новые через запятую
+        const noPhrases = [
+            "Ну нет!",
+            "Не-а!",
+            "Нет!",
+            "Попробуй еще раз",
+            "Нет",
+            "Ноуууу",
+            "Ноууууууууу",
+            "No"
+        ];
+
         function arrangeHexagon() {
             const photos = document.querySelectorAll('.scattered-photo');
             const radius = Math.min(window.innerWidth, window.innerHeight) * 0.35;
@@ -131,7 +141,6 @@
             const centerY = window.innerHeight / 2;
 
             photos.forEach((photo, index) => {
-                // Идеальный круг, разбитый на 6 точек
                 const angle = (index * (2 * Math.PI / 6)) - Math.PI / 2;
                 const x = centerX + radius * Math.cos(angle) - 65; 
                 const y = centerY + radius * Math.sin(angle) - 80;
@@ -147,21 +156,25 @@
         }
 
         window.onload = arrangeHexagon;
-        window.onresize = arrangeHexagon; // Если она повернет телефон, фото перестроятся
+        window.onresize = arrangeHexagon; 
 
-        // 2. Убегающая кнопка "Нет"
         function moveButton() {
             const btn = document.getElementById('noBtn');
             if (btn.style.position !== 'fixed') {
-                btn.style.position = 'fixed'; // Отрываем кнопку от соседки только при попытке нажать
+                btn.style.position = 'fixed'; 
             }
+            
+            // Задаем новые координаты
             const x = Math.random() * (window.innerWidth - btn.offsetWidth);
             const y = Math.random() * (window.innerHeight - btn.offsetHeight);
             btn.style.left = x + 'px';
             btn.style.top = y + 'px';
+
+            // Выбираем случайную фразу из списка и меняем текст кнопки
+            const randomPhrase = noPhrases[Math.floor(Math.random() * noPhrases.length)];
+            btn.innerText = randomPhrase;
         }
 
-        // 3. Анимация успеха (Фото остаются, вылетают сердечки)
         function startSuccessAnimation() {
             document.getElementById('quiz').style.display = 'none';
             document.getElementById('success').style.display = 'block';
@@ -169,7 +182,6 @@
             const photos = document.querySelectorAll('.scattered-photo');
             let heartCount = 0;
             
-            // Запускаем цикл выброса сердечек из каждой фотографии
             const interval = setInterval(() => {
                 photos.forEach(photo => {
                     const rect = photo.getBoundingClientRect();
@@ -189,10 +201,9 @@
                 });
                 
                 heartCount++;
-                if (heartCount > 10) clearInterval(interval); // Останавливаем фейерверк через 10 залпов
+                if (heartCount > 10) clearInterval(interval); 
             }, 400);
         }
     </script>
 </body>
 </html>
-
