@@ -16,31 +16,30 @@
             font-family: 'Georgia', serif;
             color: #4a4a4a;
             overflow: hidden;
-            padding: 20px;
         }
 
         #quiz {
             position: relative;
             z-index: 10;
             text-align: center;
-            background: rgba(255, 245, 247, 0.8); /* Легкая подложка, чтобы текст читался поверх фото */
-            padding: 20px;
-            border-radius: 30px;
+            background: rgba(255, 245, 247, 0.85); /* Полупрозрачная подложка, чтобы текст читался на фоне фото */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         h1 {
             font-size: 2rem;
             margin-bottom: 2rem;
-            text-shadow: 0 2px 10px rgba(255,255,255,0.8);
         }
 
+        /* Кнопки теперь жестко стоят рядом */
         .buttons {
             display: flex;
             gap: 20px;
             justify-content: center;
             align-items: center;
-            min-width: 300px;
-            height: 80px;
+            position: relative;
         }
 
         button {
@@ -49,30 +48,26 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.3s, background-color 0.3s;
+            transition: 0.1s;
             font-family: inherit;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            position: relative; /* Кнопки стоят в потоке */
         }
 
         #yesBtn { background-color: #ff4d6d; color: white; z-index: 11; }
         #noBtn { background-color: #e0e0e0; color: #757575; z-index: 12; }
 
-        .success-message { 
-            display: none; 
-            text-align: center; 
-            animation: fadeIn 1s ease-in; 
+        .success-message {
+            display: none;
+            text-align: center;
             z-index: 20;
-            background: rgba(255, 245, 247, 0.9);
-            padding: 30px;
-            border-radius: 30px;
+            background: rgba(255, 245, 247, 0.95);
+            padding: 40px;
+            border-radius: 20px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* --- ФОТОГРАФИИ --- */
+        /* Галерея теперь на весь экран */
         #photo-gallery {
-            position: fixed;
+            position: absolute; 
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 1;
@@ -80,28 +75,25 @@
 
         .scattered-photo {
             position: absolute;
-            width: 140px; /* Чуть уменьшил, чтобы шестиугольник влез на мобильные */
-            height: auto;
+            width: 130px; /* Оптимальный размер для телефона */
             background: white;
             padding: 6px 6px 20px 6px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
+            transition: all 1s ease-out;
         }
 
-        /* --- СЕРДЕЧКИ --- */
         .flying-heart {
             position: absolute;
-            font-size: 2.5rem;
-            color: #ff4d6d;
+            font-size: 2rem;
             pointer-events: none;
             z-index: 100;
-            animation: flyUpHeart 1.5s ease-out forwards;
+            animation: flyUp 1.5s ease-out forwards;
         }
 
-        @keyframes flyUpHeart {
-            0% { opacity: 1; transform: translate(0, 0) scale(1); }
-            100% { opacity: 0; transform: translate(var(--tx), -200px) scale(1.5); }
+        @keyframes flyUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-200px) scale(1.5); }
         }
     </style>
 </head>
@@ -131,27 +123,19 @@
     </div>
 
     <script>
-        // Функция построения шестиугольника
+        // 1. Математика шестиугольника
         function arrangeHexagon() {
             const photos = document.querySelectorAll('.scattered-photo');
-            const count = photos.length;
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            // Радиус шестиугольника (подстраивается под размер экрана)
-            const radius = Math.min(width, height) * 0.35; 
-            const centerX = width / 2;
-            const centerY = height / 2;
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.35;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
 
             photos.forEach((photo, index) => {
-                // Вычисляем угол для каждой из 6 вершин (в радианах)
-                const angle = (index * (2 * Math.PI / count)) - Math.PI / 2;
-                
-                // Координаты вершины
-                const x = centerX + radius * Math.cos(angle) - 70; // 70 - половина ширины фото
-                const y = centerY + radius * Math.sin(angle) - 80; // 80 - примерно половина высоты
-
-                const randomRot = Math.random() * 20 - 10;
+                // Идеальный круг, разбитый на 6 точек
+                const angle = (index * (2 * Math.PI / 6)) - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle) - 65; 
+                const y = centerY + radius * Math.sin(angle) - 80;
+                const randomRot = Math.random() * 30 - 15;
 
                 setTimeout(() => {
                     photo.style.left = x + 'px';
@@ -163,49 +147,50 @@
         }
 
         window.onload = arrangeHexagon;
+        window.onresize = arrangeHexagon; // Если она повернет телефон, фото перестроятся
 
+        // 2. Убегающая кнопка "Нет"
         function moveButton() {
             const btn = document.getElementById('noBtn');
-            // При первом взаимодействии переводим кнопку в фиксированное положение, чтобы она могла летать везде
             if (btn.style.position !== 'fixed') {
-                btn.style.position = 'fixed';
+                btn.style.position = 'fixed'; // Отрываем кнопку от соседки только при попытке нажать
             }
-            
             const x = Math.random() * (window.innerWidth - btn.offsetWidth);
             const y = Math.random() * (window.innerHeight - btn.offsetHeight);
-            
             btn.style.left = x + 'px';
             btn.style.top = y + 'px';
         }
 
+        // 3. Анимация успеха (Фото остаются, вылетают сердечки)
         function startSuccessAnimation() {
             document.getElementById('quiz').style.display = 'none';
             document.getElementById('success').style.display = 'block';
 
             const photos = document.querySelectorAll('.scattered-photo');
-
-            // Создаем мощный фонтан сердечек
             let heartCount = 0;
+            
+            // Запускаем цикл выброса сердечек из каждой фотографии
             const interval = setInterval(() => {
                 photos.forEach(photo => {
                     const rect = photo.getBoundingClientRect();
-                    createFlyingHeart(rect.left + rect.width/2, rect.top + rect.height/2);
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+                    
+                    const heart = document.createElement('div');
+                    heart.classList.add('flying-heart');
+                    heart.innerHTML = '❤️';
+                    
+                    const offsetX = (Math.random() - 0.5) * 50;
+                    heart.style.left = (x + offsetX - 15) + 'px';
+                    heart.style.top = y + 'px';
+                    
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 1500);
                 });
+                
                 heartCount++;
-                if (heartCount > 10) clearInterval(interval);
-            }, 300);
-        }
-
-        function createFlyingHeart(x, y) {
-            const heart = document.createElement('div');
-            heart.classList.add('flying-heart');
-            heart.innerHTML = '❤️';
-            heart.style.left = x + 'px';
-            heart.style.top = y + 'px';
-            const tx = Math.random() * 200 - 100;
-            heart.style.setProperty('--tx', tx + 'px');
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 1500);
+                if (heartCount > 10) clearInterval(interval); // Останавливаем фейерверк через 10 залпов
+            }, 400);
         }
     </script>
 </body>
