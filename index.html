@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Для тебя</title>
     <style>
+        /* Основные стили страницы */
         body {
             display: flex;
             flex-direction: column;
@@ -12,32 +13,27 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #fff5f7;
+            background-color: #fff5f7; /* Нежно-розовый фон */
             font-family: 'Georgia', serif;
             color: #4a4a4a;
-            overflow: hidden;
+            overflow: hidden; /* Скрываем полосы прокрутки */
             padding: 20px;
         }
 
-        .photo-container {
-            background: white;
-            padding: 10px 10px 30px 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transform: rotate(-3deg);
-            margin-bottom: 30px;
-            max-width: 280px;
-            opacity: 0;
-            animation: fadeInPhoto 2s ease-in forwards;
+        /* Стили для основного блока с вопросом */
+        #quiz {
+            position: relative;
+            z-index: 10; /* Вопрос должен быть поверх фото */
+            text-align: center;
         }
 
-        .photo-container img {
-            width: 100%;
-            height: auto;
-            display: block;
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.8);
         }
 
-        h1 { font-size: 1.8rem; text-align: center; margin-bottom: 2rem; }
-
+        /* Стили кнопок */
         .buttons {
             display: flex;
             gap: 20px;
@@ -45,56 +41,185 @@
             width: 100%;
             max-width: 400px;
             justify-content: center;
+            height: 60px; /* Фиксируем высоту для контейнера кнопок */
         }
 
         button {
             padding: 15px 30px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             transition: 0.3s;
             font-family: inherit;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         #yesBtn { background-color: #ff4d6d; color: white; }
-        #noBtn { background-color: #e0e0e0; color: #757575; position: absolute; }
+        #noBtn { background-color: #e0e0e0; color: #757575; position: absolute; transition: left 0.2s, top 0.2s;}
 
-        .success-message { display: none; text-align: center; animation: fadeIn 1s ease-in; }
-
-        @keyframes fadeInPhoto { from { opacity: 0; transform: rotate(-3deg) scale(0.9); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
+        /* Финальное сообщение */
+        .success-message { display: none; text-align: center; animation: fadeIn 1s ease-in; z-index: 20; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- СТИЛИ ДЛЯ ФОТОГРАФИЙ --- */
+        #photo-gallery {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Чтобы фото не мешали нажимать кнопки */
+            z-index: 1; /* Фото на заднем плане */
+        }
+
+        .scattered-photo {
+            position: absolute;
+            width: 160px; /* Размер фото */
+            height: auto;
+            background: white;
+            padding: 8px 8px 25px 8px; /* Эффект поляроида */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transform: rotate(var(--rotation)); /* Случайный наклон */
+            transition: all 0.8s ease-out;
+            opacity: 0; /* Сначала невидимы */
+            animation: photoAppear 1.5s ease-out forwards;
+        }
+
+        /* Анимация появления фото */
+        @keyframes photoAppear {
+             from { opacity: 0; transform: translateY(50px) rotate(var(--rotation)) scale(0.8); }
+             to { opacity: 0.95; transform: translateY(0) rotate(var(--rotation)) scale(1); }
+        }
+
+        /* Класс, который добавляется к фото при успехе (они исчезают) */
+        .photos-fade-out {
+            opacity: 0 !important;
+            transform: scale(1.2) rotate(var(--rotation)) !important;
+        }
+
+        /* --- СТИЛИ ДЛЯ ВЫЛЕТАЮЩИХ СЕРДЕЧЕК --- */
+        .flying-heart {
+            position: absolute;
+            font-size: 2.5rem;
+            color: #ff4d6d;
+            pointer-events: none;
+            z-index: 100;
+            animation: flyUpHeart 1.5s ease-out forwards;
+        }
+
+        @keyframes flyUpHeart {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--tx), -150px) scale(1.5); }
+        }
     </style>
 </head>
 <body>
 
+    <div id="photo-gallery">
+        <img src="photo1.jpg" class="scattered-photo" alt="Memory">
+        <img src="photo2.jpg" class="scattered-photo" alt="Memory">
+        <img src="photo3.jpg" class="scattered-photo" alt="Memory">
+	<img src="photo4.jpg" class="scattered-photo" alt="Memory">
+	<img src="photo5.jpg" class="scattered-photo" alt="Memory">
+	<img src="photo6.jpg" class="scattered-photo" alt="Memory">
+    </div>
+
+
     <div id="quiz">
-        <div class="photo-container">
-            <img src="https://i.imgur.com/ВашеФото.jpg" alt="Memory">
-        </div>
         <h1>Паночка, ты будешь моей валентинкой?</h1>
         <div class="buttons">
-            <button id="yesBtn" onclick="showSuccess()">Да</button>
-            <button id="noBtn" onmouseover="moveButton()">Нет</button>
+            <button id="yesBtn" onclick="startSuccessAnimation()">Да</button>
+            <button id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">Нет</button>
         </div>
     </div>
 
     <div id="success" class="success-message">
-        <p style="font-size: 2rem;">Урраааа!!!❤️</p>
-        <p>Я тебя люблю!!</p>
+        <p style="font-size: 2.5rem; margin: 20px;">❤️</p>
+        <p style="font-size: 1.5rem;">Уррраааааа!</p>
+        <p style="color: #666;">Я тебя люблю!</p>
     </div>
 
     <script>
+        // Функция, которая раскидывает фото при загрузке
+        function scatterPhotos() {
+            const photos = document.querySelectorAll('.scattered-photo');
+            photos.forEach((photo, index) => {
+                // Случайные координаты
+                const randomX = Math.random() * (window.innerWidth - 180);
+                const randomY = Math.random() * (window.innerHeight - 250);
+                // Случайный наклон от -15 до +15 градусов
+                const randomRot = Math.random() * 30 - 15;
+
+                photo.style.left = randomX + 'px';
+                photo.style.top = randomY + 'px';
+                photo.style.setProperty('--rotation', randomRot + 'deg');
+                // Небольшая задержка появления для каждого фото
+                photo.style.animationDelay = (index * 0.3) + 's';
+            });
+        }
+
+        // Запускаем раскидывание фото при загрузке страницы
+        window.onload = scatterPhotos;
+
+
+        // Функция для убегающей кнопки "Нет"
         function moveButton() {
             const btn = document.getElementById('noBtn');
-            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
+            // Ограничиваем область побега, чтобы не убегала слишком далеко
+            const container = document.querySelector('.buttons');
+            const rect = container.getBoundingClientRect();
+
+            const randomX = Math.random() * 200 - 100; // Сдвиг влево/вправо
+            const randomY = Math.random() * 200 - 100; // Сдвиг вверх/вниз
+
+            btn.style.transform = `translate(${randomX}px, ${randomY}px)`;
         }
-        function showSuccess() {
+
+        // ГЛАВНАЯ ФУНКЦИЯ УСПЕХА
+        function startSuccessAnimation() {
+            // 1. Скрываем вопрос
             document.getElementById('quiz').style.display = 'none';
+            // 2. Показываем финальное сообщение
             document.getElementById('success').style.display = 'block';
+
+            const photos = document.querySelectorAll('.scattered-photo');
+
+            // 3. Запускаем фейерверк из сердечек от каждой фотки
+            photos.forEach(photo => {
+                // Получаем центр фотографии
+                const rect = photo.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                // Создаем 3 сердечка для каждой фотки
+                for (let i = 0; i < 6; i++) {
+                    createFlyingHeart(centerX, centerY);
+                }
+                // Заставляем фото исчезнуть красиво
+                photo.classList.add('photos-fade-out');
+            });
+        }
+
+        // Функция создания одного летящего сердечка
+        function createFlyingHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.classList.add('flying-heart');
+            heart.innerHTML = '❤️';
+            // Небольшой разброс, чтобы они не летели кучей
+            const offsetX = Math.random() * 60 - 30;
+            const offsetY = Math.random() * 60 - 30;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+
+            // Случайное направление полета вбок
+            const tx = Math.random() * 100 - 50;
+            heart.style.setProperty('--tx', tx + 'px');
+
+             // Случайная задержка анимации
+            heart.style.animationDelay = Math.random() * 0.5 + 's';
+
+            document.body.appendChild(heart);
+
+            // Удаляем сердечко из кода после того, как оно улетело
+            setTimeout(() => heart.remove(), 1600);
         }
     </script>
 </body>
